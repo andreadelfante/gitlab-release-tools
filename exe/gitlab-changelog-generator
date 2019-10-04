@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+require "gitlab/changelog/generator"
+require 'gitlab/changelog/writer'
+require 'dotenv'
+
+Dotenv.load('../.env')
+
+endpoint = ENV["GITLAB_BASE_URL"]
+private_token = ENV["PRIVATE_TOKEN"]
+
+generator = Gitlab::Changelog::Generator.new(
+    endpoint: endpoint,
+    private_token: private_token,
+)
+
+changelog = generator.changelog("2.1", project_id: 1, include_issues: false)
+writer = Gitlab::Changelog::Writer.new
+
+print(writer.write_on_string(changelog))
+writer.write_on_file('../result.txt', changelog)
