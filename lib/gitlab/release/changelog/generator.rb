@@ -12,11 +12,11 @@ module Gitlab
         # @param [Integer] max_loop_merge_requests
         # @param [Integer] max_loop_issues
         def initialize(endpoint, private_token, formatter = nil, max_loop_merge_requests = 1000, max_loop_issues = 1000)
+          super(endpoint, private_token)
+
           @formatter = formatter || Formatter.new
           @max_loops_merge_requests = max_loop_merge_requests
           @max_loop_issues = max_loop_issues
-
-          super(endpoint, private_token)
         end
 
         # @param [String] version_name required

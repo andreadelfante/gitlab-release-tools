@@ -1,12 +1,8 @@
-require 'gitlab/release/base/api_client'
+require 'gitlab/release/api_client'
 
 module Gitlab
   module Release
     class Manager < ApiClient
-      def initialize(endpoint, private_token)
-        super(endpoint, private_token)
-      end
-
       # @param [String] tag_name
       # @param [String] changelog
       # @param [String or Integer] project_id default ENV["CI_PROJECT_ID"]
