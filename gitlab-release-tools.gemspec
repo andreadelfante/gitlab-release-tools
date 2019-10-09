@@ -1,17 +1,17 @@
 
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "gitlab/changelog/version"
+require "gitlab/release/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "gitlab-changelog-generator"
-  spec.version       = Gitlab::Changelog::VERSION
+  spec.name          = "gitlab-release-tools"
+  spec.version       = Gitlab::Release::VERSION
   spec.authors       = ["Andrea Del Fante"]
   spec.email         = ["andreadelfante94@gmail.com"]
 
-  spec.summary       = "Auto-generation gitlab changelog made simple."
-  spec.description   = "Auto-generate gitlab changelog from MR and issues for your new versions."
-  spec.homepage      = "https://github.com/andreadelfante/gitlab-changelog-generator"
+  spec.summary       = "Automation gitlab release tools made simple."
+  spec.description   = "Automation gitlab release tools from MR and issues for your new versions."
+  spec.homepage      = "https://github.com/andreadelfante/gitlab-release-tools"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
@@ -36,10 +36,11 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency "gitlab", "~>  4.12.0"
+  spec.add_runtime_dependency "gitlab", "~> 4.12.0"
 
-  spec.add_development_dependency "bundler", "~> 1.16"
+  spec.add_development_dependency "bundler", "~> 2.0"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "dotenv"
+  spec.add_development_dependency 'webmock'
 end

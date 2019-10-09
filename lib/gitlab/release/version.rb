@@ -1,5 +1,5 @@
 module Gitlab
-  module Changelog
+  module Release
     VERSION = "0.1.0"
   end
 end
