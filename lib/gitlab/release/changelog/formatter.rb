@@ -1,25 +1,21 @@
+require 'gitlab/release/changelog/entry'
+
 module Gitlab
   module Release
     module Changelog
       class Formatter
-        # @param [Gitlab::ObjectifiedHash] merge_request
+        # @param [MergeRequest] merge_request
         # @param [TrueClass or FalseClass] with_reference
         # @return [String]
-        def format_merge_request(merge_request, with_reference = true)
-          id = merge_request.iid
-          title = merge_request.title
-
-          with_reference ? "- #{title} !#{id}" : "- #{title}"
+        def format_merge_request(merge_request, with_reference)
+          with_reference ? "- #{merge_request.title} !#{merge_request.id}" : "- #{merge_request.title}"
         end
 
-        # @param [Gitlab::ObjectifiedHash] issue
+        # @param [Issue] issue
         # @param [TrueClass or FalseClass] with_reference
         # @return [String]
-        def format_issue(issue, with_reference = true)
-          id = issue.iid
-          title = issue.title
-
-          with_reference ? "- #{title} ##{id}" : "- #{title}"
+        def format_issue(issue, with_reference)
+          with_reference ? "- #{issue.title} ##{issue.id}" : "- #{issue.title}"
         end
       end
     end
