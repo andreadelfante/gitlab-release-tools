@@ -12,22 +12,17 @@ module Gitlab
           @elements.push(element)
         end
 
-        # @param [TrueClass or FalseClass] with_reference
-        # @param [Formatter] formatter
-        # @return String
-        def as_string(with_reference, formatter = nil)
-          @elements.map { |element| element.string_changelog(with_reference, formatter) }
+        def to_s
+          @elements.map { |element| element.to_s }
               .join("\n")
-              .reject(&:empty?)
+              #.reject(&:empty?)
         end
 
         # @param [String] path
-        # @param [TrueClass or FalseClass] with_reference
-        # @param [Formatter] formatter
         # @param [TrueClass or FalseClass] appending default false
-        def write_on_file(path, with_reference, formatter = nil, appending = false)
+        def write_on_file(path, appending = false)
           # @type [String] changelog_string
-          changelog_string = as_string(with_reference, formatter)
+          changelog_string = to_s
 
           File.open(path, appending ? "a" : "w+") do |file|
             file.puts(changelog_string)
