@@ -10,6 +10,5 @@ private_token = ENV["PRIVATE_TOKEN"]
 
 generator = Gitlab::Release::Changelog::Generator.new(endpoint, private_token)
 
-changelog = generator.changelog("1.1", project_id: 50, filtering_labels: %w(changelog ios))
-
-print(changelog.to_s)
+changelog = generator.changelog("1.1", project_id: 50)
+print(changelog)

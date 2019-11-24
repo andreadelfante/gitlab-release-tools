@@ -3,7 +3,6 @@ require 'gitlab'
 
 RSpec.describe "Gitlab::Release::Manager" do
   before do
-    stub_get("/projects/#{PROJECT_ID}/repository/tags", 'tags')
     stub_const("ENV", {
         :CI_PROJECT_ID => PROJECT_ID,
         :CI_COMMIT_SHA => COMMIT_SHA,
@@ -16,25 +15,18 @@ RSpec.describe "Gitlab::Release::Manager" do
     tag_name = '0.0.1'
     stub_post("/projects/#{PROJECT_ID}/repository/tags", 'tag_create')
 
-    [PROJECT_ID, nil].each do |project_id|
-      [COMMIT_SHA, 'master'].each do |ref|
-        @manager.define_tag(tag_name, '"and it has release notes"', project_id: project_id, ref: ref)
+    @manager.define_tag(tag_name, '"and it has release notes"', project_id: PROJECT_ID, ref: 'master')
 
-        expect(a_post("/projects/#{PROJECT_ID}/repository/tags")).to have_been_made
-      end
-    end
+    expect(a_post("/projects/#{PROJECT_ID}/repository/tags")).to have_been_made
   end
 
   it 'close milestones with version name' do
-    stub_post
+    stub_get("/projects/#{PROJECT_ID}/milestones", 'milestones')
+    stub_put("/projects/#{PROJECT_ID}/milestones/1", 'milestones')
 
-    [PROJECT_ID, nil].each do |project_id|
-      stub_post("/projects/#{project_id}/milestones", 'milestones')
+    @manager.close_milestones("3.0", project_id: PROJECT_ID)
 
-      @manager.close_milestones("3.0", project_id: project_id)
-
-      expect(a_get("/projects/#{project_id}/milestones")).to have_been_made
-      expect(a_post("/projects/#{project_id}/milestones")).to have_been_made
-    end
+    expect(a_get("/projects/#{PROJECT_ID}/milestones")).to have_been_made
+    expect(a_put("/projects/#{PROJECT_ID}/milestones/1")).to have_been_made
   end
 end

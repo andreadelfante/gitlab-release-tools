@@ -54,22 +54,20 @@ module Gitlab
         # @param Array[String] filtering_labels
         private def changelog_from_merge_requests(entries, project_id, version_name, filtering_labels)
           select_milestones(project_id, version_name).each do |milestone|
-            i = 0
+            i = 1
             all = false
+
             while i < @max_loops_merge_requests and !all
               merge_requests = @client.milestone_merge_requests(project_id, milestone.id, {page: i})
+              all = merge_requests.empty?
 
-              if merge_requests.empty?
-                all = true
-              else
-                merge_requests.each do |mr|
-                  if check_mr(mr, filtering_labels)
-                    entries.push(MergeRequest.new(mr.iid, mr.title))
-                  end
+              merge_requests.each do |mr|
+                if check_mr(mr, filtering_labels)
+                  entries.push(MergeRequest.new(mr.iid, mr.title))
                 end
-
-                i += 1
               end
+
+              i += 1
             end
           end
         end
@@ -78,11 +76,7 @@ module Gitlab
         # @param [Array[String]] filtering_labels
         # @return [TrueClass or FalseClass]
         private def check_mr(mr, filtering_labels)
-          filtering_labels_set = filtering_labels.to_set
-          mr_labels_set = mr.labels.to_set
-
-          #TODO: le filtering labels set devono essere trattate come un AND
-          mr.state == 'merged' and mr_labels_set.include?(filtering_labels_set)
+          mr.state == 'merged' and (filtering_labels - mr.labels).empty?
         end
 
         # @param [Entries] entries
@@ -92,35 +86,29 @@ module Gitlab
         # @param Array[String] filtering_labels
         private def changelog_from_issues(entries, project_id, version_name, filtering_labels)
           select_milestones(project_id, version_name).each do |milestone|
-            i = 0
+            i = 1
             all = false
+
             while i < @max_loop_issues and !all
               issues = @client.milestone_issues(project_id, milestone.id, {page: i})
+              all = issues.empty?
 
-              if issues.empty?
-                all = true
-              else
-                issues.each do |issue|
-                  if check_issue(issue, filtering_labels)
-                    entries.push(Issue.new(issue.id, issue.title))
-                  end
+              issues.each do |issue|
+                if check_issue(issue, filtering_labels)
+                  entries.push(Issue.new(issue.id, issue.title))
                 end
-
-                i += 1
               end
+
+              i += 1
             end
           end
         end
 
-        # @param [Gitlab::ObjectifiedHash] mr
+        # @param [Gitlab::ObjectifiedHash] issue
         # @param [Array[String]] filtering_labels
         # @return [TrueClass or FalseClass]
         private def check_issue(issue, filtering_labels)
-          filtering_labels_set = filtering_labels.to_set
-          issue_labels_set = issue.labels.to_set
-
-          #TODO: le filtering labels set devono essere trattate come un AND
-          issue.closed? and issue_labels_set.include?(filtering_labels_set)
+          issue.state == 'closed' and (filtering_labels - issue.labels).empty?
         end
       end
     end
