@@ -6,6 +6,7 @@ require 'gitlab'
 ENDPOINT = 'https://api.example.com'
 PRIVATE_TOKEN = 'secret'
 PROJECT_ID = 3
+MILESTONE_ID = 1
 COMMIT_SHA = "b55be4dc5c052fb0058ef1ea96acd5e4e37f1bed"
 
 RSpec.configure do |config|

@@ -12,12 +12,26 @@ RSpec.describe "Gitlab::Release::Changelog::Generator" do
   end
 
   it 'generate a changelog' do
-    version = "1.0"
+    stub_get("/projects/#{PROJECT_ID}/milestones", 'milestones')
+    stub_get("/projects/#{PROJECT_ID}/milestones/#{MILESTONE_ID}/merge_requests?page=1", 'milestone_merge_requests')
+    stub_get("/projects/#{PROJECT_ID}/milestones/#{MILESTONE_ID}/merge_requests?page=2", 'empty_array')
+    stub_get("/projects/#{PROJECT_ID}/milestones/#{MILESTONE_ID}/issues?page=1", 'milestone_issues')
+    stub_get("/projects/#{PROJECT_ID}/milestones/#{MILESTONE_ID}/issues?page=2", 'empty_array')
 
-    @generator.changelog(version,
-                         project_id: PROJECT_ID,
-                         include_mrs: true,
-                         include_issues: true,
-                         filtering_labels: %w(changelog sd))
+    version = "3.0"
+
+    expected = Gitlab::Release::Changelog::Entries.new
+    expected.push(Gitlab::Release::Changelog::MergeRequest.new(1, 'lorem ipsum'))
+    expected.push(Gitlab::Release::Changelog::Issue.new(1, 'Culpa eius recusandae suscipit autem distinctio dolorum.'))
+    expected.push(Gitlab::Release::Changelog::Issue.new(6, 'Ut in dolorum omnis sed sit aliquam.'))
+    expected.push(Gitlab::Release::Changelog::Issue.new(12, 'Veniam et tempore quidem eum reprehenderit cupiditate non aut velit eaque.'))
+
+    result = @generator.changelog(version,
+                                  project_id: PROJECT_ID,
+                                  include_mrs: true,
+                                  include_issues: true,
+                                  filtering_labels: %w(changelog))
+
+    expect(result.to_s).to eq(expected.to_s)
   end
 end
