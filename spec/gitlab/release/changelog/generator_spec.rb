@@ -11,7 +11,7 @@ RSpec.describe "Gitlab::Release::Changelog::Generator" do
     @generator = Gitlab::Release::Changelog::Generator.new(ENDPOINT, PRIVATE_TOKEN)
   end
 
-  it 'generate a changelog' do
+  it 'generates a changelog' do
     stub_get("/projects/#{PROJECT_ID}/milestones", 'milestones')
     stub_get("/projects/#{PROJECT_ID}/milestones/#{MILESTONE_ID}/merge_requests?page=1", 'milestone_merge_requests')
     stub_get("/projects/#{PROJECT_ID}/milestones/#{MILESTONE_ID}/merge_requests?page=2", 'empty_array')
@@ -32,6 +32,8 @@ RSpec.describe "Gitlab::Release::Changelog::Generator" do
                                   include_issues: true,
                                   filtering_labels: %w(changelog))
 
-    expect(result.to_s).to eq(expected.to_s)
+    [true, false].each do |with_reference|
+      expect(result.to_s_with_reference(with_reference)).to eq(expected.to_s_with_reference(with_reference))
+    end
   end
 end

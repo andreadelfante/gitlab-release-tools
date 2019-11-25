@@ -13,16 +13,21 @@ module Gitlab
         end
 
         def to_s
-          @elements.map { |element| element.to_s }
+          to_s_with_reference(true)
+        end
+
+        # @param [Boolean] with_reference
+        def to_s_with_reference(with_reference)
+          @elements.map { |element| element.to_s_with_reference(with_reference) }
               .join("\n")
-              #.reject(&:empty?)
         end
 
         # @param [String] path
-        # @param [TrueClass or FalseClass] appending default false
-        def write_on_file(path, appending = false)
+        # @param [Boolean] appending default false
+        # @param [Boolean] with_reference default true
+        def write_on_file(path, appending = false, with_reference = true)
           # @type [String] changelog_string
-          changelog_string = to_s
+          changelog_string = to_s_with_reference(with_reference)
 
           File.open(path, appending ? "a" : "w+") do |file|
             file.puts(changelog_string)

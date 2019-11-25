@@ -13,26 +13,50 @@ RSpec.describe  "Gitlab::Release::Changelog::Entries" do
     File.delete(@path)
   end
 
-  it 'white a new changelog file' do
+  it 'writes a new changelog file with references' do
     @entries.push(Gitlab::Release::Changelog::MergeRequest.new(1, 'New MR'))
     @entries.push(Gitlab::Release::Changelog::Issue.new(2, 'New Issue'))
 
-    @entries.write_on_file(@path, false)
+    @entries.write_on_file(@path, false, true)
     data = File.read(@path)
 
-    expect(data).to eq("#{@entries.to_s}\n")
+    expect(data).to eq("#{@entries.to_s_with_reference(true)}\n")
   end
 
-  it 'append changelog in a file' do
+  it 'writes a new changelog file without references' do
+    @entries.push(Gitlab::Release::Changelog::MergeRequest.new(1, 'New MR'))
+    @entries.push(Gitlab::Release::Changelog::Issue.new(2, 'New Issue'))
+
+    @entries.write_on_file(@path, false, false)
+    data = File.read(@path)
+
+    expect(data).to eq("#{@entries.to_s_with_reference(false)}\n")
+  end
+
+  it 'appends changelog in a file with references' do
     @entries.push(Gitlab::Release::Changelog::MergeRequest.new(1, 'New MR'))
     @entries.push(Gitlab::Release::Changelog::Issue.new(2, 'New Issue'))
 
     File.open(@path, 'w+') do |file|
       file.puts(@begin_content)
     end
-    @entries.write_on_file(@path, true)
+    @entries.write_on_file(@path, true, true)
     data = File.read(@path)
-    expected = "#{@begin_content}\n#{@entries.to_s}\n"
+    expected = "#{@begin_content}\n#{@entries.to_s_with_reference(true)}\n"
+
+    expect(data).to eq(expected)
+  end
+
+  it 'appends changelog in a file without references' do
+    @entries.push(Gitlab::Release::Changelog::MergeRequest.new(1, 'New MR'))
+    @entries.push(Gitlab::Release::Changelog::Issue.new(2, 'New Issue'))
+
+    File.open(@path, 'w+') do |file|
+      file.puts(@begin_content)
+    end
+    @entries.write_on_file(@path, true, false)
+    data = File.read(@path)
+    expected = "#{@begin_content}\n#{@entries.to_s_with_reference(false)}\n"
 
     expect(data).to eq(expected)
   end

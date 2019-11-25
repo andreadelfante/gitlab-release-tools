@@ -11,20 +11,21 @@ module Gitlab
           @title = title
         end
 
-        def to_s
-          "[#{@id}] #{@title}"
+        # @param [Boolean] with_reference
+        def to_s_with_reference(with_reference)
+          "- #{title}"
         end
       end
 
       class MergeRequest < Entry
-        def to_s
-          "- #{title} !#{id}"
+        def to_s_with_reference(with_reference)
+          with_reference ? "- #{title} !#{id}" : super
         end
       end
 
       class Issue < Entry
-        def to_s
-          "- #{title} ##{id}"
+        def to_s_with_reference(with_reference)
+          with_reference ? "- #{title} ##{id}" : super
         end
       end
     end

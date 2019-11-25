@@ -11,7 +11,7 @@ RSpec.describe "Gitlab::Release::Manager" do
     @manager = Gitlab::Release::Manager.new(ENDPOINT, PRIVATE_TOKEN)
   end
 
-  it 'define a tag' do
+  it 'defines a tag' do
     tag_name = '0.0.1'
     stub_post("/projects/#{PROJECT_ID}/repository/tags", 'tag_create')
 
@@ -20,7 +20,7 @@ RSpec.describe "Gitlab::Release::Manager" do
     expect(a_post("/projects/#{PROJECT_ID}/repository/tags")).to have_been_made
   end
 
-  it 'close milestones with version name' do
+  it 'closes milestones with version name' do
     stub_get("/projects/#{PROJECT_ID}/milestones", 'milestones')
     stub_put("/projects/#{PROJECT_ID}/milestones/1", 'milestones')
 
