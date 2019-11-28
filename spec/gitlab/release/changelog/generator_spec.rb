@@ -8,7 +8,8 @@ RSpec.describe "Gitlab::Release::Changelog::Generator" do
         :CI_COMMIT_SHA => COMMIT_SHA,
     })
 
-    @generator = Gitlab::Release::Changelog::Generator.new(ENDPOINT, PRIVATE_TOKEN)
+    @generator = Gitlab::Release::Changelog::Generator.new(endpoint: ENDPOINT,
+                                                           private_token: PRIVATE_TOKEN)
   end
 
   it 'generates a changelog' do

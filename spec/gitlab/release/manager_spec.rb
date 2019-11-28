@@ -8,7 +8,8 @@ RSpec.describe "Gitlab::Release::Manager" do
         :CI_COMMIT_SHA => COMMIT_SHA,
     })
 
-    @manager = Gitlab::Release::Manager.new(ENDPOINT, PRIVATE_TOKEN)
+    @manager = Gitlab::Release::Manager.new(endpoint: ENDPOINT,
+                                            private_token: PRIVATE_TOKEN)
   end
 
   it 'defines a tag' do
