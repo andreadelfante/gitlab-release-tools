@@ -32,8 +32,7 @@ RSpec.describe "Gitlab::Release::Changelog::Generator" do
                                   include_issues: true,
                                   filtering_labels: %w(changelog))
 
-    [true, false].each do |with_reference|
-      expect(result.to_s_with_reference(with_reference)).to eq(expected.to_s_with_reference(with_reference))
-    end
+    expect(result.to_s).to eq(expected.to_s)
+    expect(result.to_s_with_reference).to eq(expected.to_s_with_reference)
   end
 end

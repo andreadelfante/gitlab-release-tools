@@ -2,61 +2,83 @@ require 'gitlab/release/changelog/entries'
 require 'gitlab/release/changelog/entry'
 require 'gitlab'
 
-RSpec.describe  "Gitlab::Release::Changelog::Entries" do
+RSpec.describe "Gitlab::Release::Changelog::Entries" do
   before(:each) do
     @entries = Gitlab::Release::Changelog::Entries.new
     @path = "./#{DateTime.now}.txt"
+    @first_path = './entries-0.txt'
+    @second_path = './entries-1.txt'
+    @regex_path = './entries-*.txt'
     @begin_content = "In this version:"
+
+    @entries.push(Gitlab::Release::Changelog::MergeRequest.new(1, 'New MR'))
+    @entries.push(Gitlab::Release::Changelog::Issue.new(2, 'New Issue'))
   end
 
   after(:each) do
-    File.delete(@path)
+    [@path, @first_path, @second_path, @regex_path].each do |path|
+      File.delete(path) if File.exists?(path)
+    end
   end
 
   it 'writes a new changelog file with references' do
-    @entries.push(Gitlab::Release::Changelog::MergeRequest.new(1, 'New MR'))
-    @entries.push(Gitlab::Release::Changelog::Issue.new(2, 'New Issue'))
-
-    @entries.write_on_file(@path, false, true)
-    data = File.read(@path)
-
-    expect(data).to eq("#{@entries.to_s_with_reference(true)}\n")
+    execute_test(@entries, @path, nil, true)
   end
 
   it 'writes a new changelog file without references' do
-    @entries.push(Gitlab::Release::Changelog::MergeRequest.new(1, 'New MR'))
-    @entries.push(Gitlab::Release::Changelog::Issue.new(2, 'New Issue'))
+    execute_test(@entries, @path, nil, false)
+  end
 
-    @entries.write_on_file(@path, false, false)
-    data = File.read(@path)
-
-    expect(data).to eq("#{@entries.to_s_with_reference(false)}\n")
+  it 'writes a new changelog on multiple files without references' do
+    execute_test_regex(@entries,
+                       [@first_path, @second_path],
+                       @regex_path,
+                       nil,
+                       false)
   end
 
   it 'appends changelog in a file with references' do
-    @entries.push(Gitlab::Release::Changelog::MergeRequest.new(1, 'New MR'))
-    @entries.push(Gitlab::Release::Changelog::Issue.new(2, 'New Issue'))
-
-    File.open(@path, 'w+') do |file|
-      file.puts(@begin_content)
-    end
-    @entries.write_on_file(@path, true, true)
-    data = File.read(@path)
-    expected = "#{@begin_content}\n#{@entries.to_s_with_reference(true)}\n"
-
-    expect(data).to eq(expected)
+    execute_test(@entries, @path, @begin_content, true)
   end
 
   it 'appends changelog in a file without references' do
-    @entries.push(Gitlab::Release::Changelog::MergeRequest.new(1, 'New MR'))
-    @entries.push(Gitlab::Release::Changelog::Issue.new(2, 'New Issue'))
+    execute_test(@entries, @path, @begin_content, false)
+  end
 
-    File.open(@path, 'w+') do |file|
-      file.puts(@begin_content)
+  it 'appends changelog on multiple files with references' do
+    execute_test_regex(@entries,
+                       [@first_path, @second_path],
+                       @regex_path,
+                       @begin_content,
+                       true)
+  end
+end
+
+private def execute_test(entries, path, begin_content, with_reference)
+  appending = defined?(begin_content).nil?
+
+  File.open(path, 'w+') { |file| file.puts(appending ? begin_content : "") }
+
+  @entries.write_in_file(path, appending, with_reference)
+  data = File.read(path)
+  expected = "#{appending ? begin_content : ''}#{with_reference ? entries.to_s_with_reference : entries}\n"
+
+  expect(data).to eq(expected)
+end
+
+private def execute_test_regex(entries, paths, regex_path, begin_content, with_reference)
+  appending = defined?(begin_content).nil?
+
+  paths.each do |path|
+    File.open(path, "w+") do |file|
+      file.puts(appending ? begin_content : "")
     end
-    @entries.write_on_file(@path, true, false)
-    data = File.read(@path)
-    expected = "#{@begin_content}\n#{@entries.to_s_with_reference(false)}\n"
+  end
+  entries.write_in_file(regex_path, appending, with_reference)
+
+  paths.each do |path|
+    data = File.read(path)
+    expected = "#{appending ? begin_content : ''}#{with_reference ? entries.to_s_with_reference : entries}\n"
 
     expect(data).to eq(expected)
   end

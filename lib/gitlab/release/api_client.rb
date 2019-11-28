@@ -3,12 +3,10 @@ require 'gitlab'
 module Gitlab
   module Release
     class ApiClient
-      # @param [String] endpoint API endpoint URL, default: ENV['GITLAB_API_ENDPOINT'] and falls back to ENV['CI_API_V4_URL']
-      # @param [String] private_token user's private token or OAuth2 access token, default: ENV['GITLAB_API_PRIVATE_TOKEN']
-      def initialize(endpoint, private_token)
+      def initialize(options = {})
         @client = Gitlab.client(
-            endpoint: endpoint,
-            private_token: private_token
+            endpoint: options[:endpoint],
+            private_token: options[:private_token]
         )
       end
 

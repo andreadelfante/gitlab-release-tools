@@ -8,7 +8,8 @@ Dotenv.load('../.env')
 endpoint = ENV["GITLAB_BASE_URL"]
 private_token = ENV["PRIVATE_TOKEN"]
 
-generator = Gitlab::Release::Changelog::Generator.new(endpoint, private_token)
+generator = Gitlab::Release::Changelog::Generator.new(endpoint: endpoint,
+                                                      private_token: private_token)
 
 changelog = generator.changelog("1.1", project_id: 50)
 print(changelog)
