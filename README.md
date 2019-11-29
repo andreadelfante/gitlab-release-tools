@@ -37,7 +37,7 @@ manager.define_tag(version, changelog.to_s_with_reference)
 manager.close_milestones(version)
 ```
 
-Check out the [documentation](./doc/index.html) for more.
+Check out the [documentation](https://andreadelfante.github.io/gitlab-release-tools/) for more.
 
 ## Development
 
